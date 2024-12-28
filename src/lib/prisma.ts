@@ -14,6 +14,7 @@ import {
   Goal,
   Initiative,
   Scope1And2,
+  Equality,
 } from '@prisma/client'
 import { OptionalNullable } from './type-utils'
 
@@ -502,6 +503,61 @@ export async function updateInitiative(
 
 export async function deleteInitiative(id: Initiative['id']) {
   return prisma.initiative.delete({ where: { id } })
+}
+
+export async function createEqualities(
+  wikidataId: Company['wikidataId'],
+  equialities: OptionalNullable<
+    Omit<Equality, 'metadataId' | 'reportingPeriodId' | 'companyId' | 'id'>
+  >[],
+  metadata: Metadata
+) {
+  return prisma.$transaction(
+    equialities.map((equality) =>
+      prisma.equality.create({
+        data: {
+          ...equality,
+          description: equality.description,
+          company: {
+            connect: {
+              wikidataId,
+            },
+          },
+          metadata: {
+            connect: {
+              id: metadata.id,
+            },
+          },
+        },
+        select: { id: true },
+      })
+    )
+  )
+}
+
+export async function updateEquality(
+  id: Equality['id'],
+  equality: OptionalNullable<
+    Omit<Equality, 'metadataId' | 'reportingPeriodId' | 'companyId' | 'id'>
+  >,
+  metadata: Metadata
+) {
+  return prisma.equality.update({
+    where: { id },
+    data: {
+      ...equality,
+      metadata: {
+        connect: {
+          id: metadata.id,
+        },
+      },
+    },
+    select: { id: true },
+  })
+}
+
+export async function deleteEquality(id: Equality['id']) {
+  return prisma.equality.delete({ where: { id } })
 }
 
 export async function upsertTurnover(

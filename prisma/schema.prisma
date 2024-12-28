@@ -31,6 +31,7 @@ model Company {
   reportingPeriods ReportingPeriod[]
   goals            Goal[]
   initiatives      Initiative[]
+  equalities       Equality[]
   baseYears        BaseYear[]
 
   /// A comment only visible for reviewers to help them work with the company data and remember important info about this company.
@@ -318,6 +319,17 @@ model Initiative {
 
   company  Company  @relation(fields: [companyId], references: [wikidataId])
   metadata Metadata @relation(fields: [metadataId], references: [id])
+}
+
+model Equality {
+  id          Int     @id @default(autoincrement())
+  goals       Goal[]
+  initiatives Initiative[]
+  metadataId  Int
+  companyId   String
+
+  metadata Metadata @relation(fields: [metadataId], references: [id])
+  company  Company  @relation(fields: [companyId], references: [wikidataId])
 }
 
 /// Every datapoint has associated metadata about who changed it, when, and using what source

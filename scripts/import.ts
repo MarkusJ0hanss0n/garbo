@@ -18,6 +18,7 @@ export type CompanyInput = {
   internalComment?: string
   initiatives?: InitiativeInput[]
   goals?: GoalInput[]
+  equalities?: EqualityInput[]
   reportingPeriods: ReportingPeriodInput[]
 }
 
@@ -25,6 +26,10 @@ export type InitiativeInput = {
   //
 }
 export type GoalInput = {
+  //
+}
+
+export type EqualityInput = {
   //
 }
 

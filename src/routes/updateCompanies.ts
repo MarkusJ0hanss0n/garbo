@@ -15,6 +15,8 @@ import {
   updateGoal,
   createInitiatives,
   updateInitiative,
+  createEqualities,
+  updateEquality,
   createIndustry,
   updateIndustry,
   upsertReportingPeriod,
@@ -23,6 +25,7 @@ import {
   upsertScope1And2,
   deleteInitiative,
   deleteGoal,
+  deleteEquality,
   updateReportingPeriodReportURL,
 } from '../lib/prisma'
 import {
@@ -250,6 +253,95 @@ router.delete(
         error.code === 'P2025'
       ) {
         throw new GarboAPIError('Initiative not found', {
+          statusCode: 404,
+          original: error,
+        })
+      }
+      throw error
+    })
+    res.json({ ok: true })
+  }
+)
+
+const equalitySchema = z.object({
+  initiatives: z.array(
+    z.object({
+      description: z.string(),
+      year: z.number().optional(),
+      target: z.string().optional(),
+      baseYear: z.number().optional(),
+    })
+  ).optional(),
+  goals: z.array(
+    z.object({
+      description: z.string(),
+      year: z.number().optional(),
+      target: z.string().optional(),
+      baseYear: z.number().optional(),
+    })
+  ).optional()
+})
+
+router.post(
+  '/:wikidataId/equalities',
+  processRequest({
+    body: z.object({
+      equalities: z.array(equalitySchema),
+    }),
+    params: wikidataIdParamSchema,
+  }),
+  async (req, res) => {
+    const { equalities } = req.body
+
+    if (equalities?.length) {
+      const { wikidataId } = req.params
+      const metadata = res.locals.metadata
+
+      await createEqualities(wikidataId, equalities, metadata!)
+    }
+    res.json({ ok: true })
+  }
+)
+
+router.patch(
+  '/:wikidataId/equalities/:id',
+  processRequest({
+    body: z.object({ equality: equalitySchema }),
+    params: z.object({ id: z.coerce.number() }),
+  }),
+  async (req, res) => {
+    const { equality } = req.body
+    const { id } = req.params
+    const metadata = res.locals.metadata
+    await updateEquality(id, equality, metadata!).catch((error) => {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new GarboAPIError('Equality not found', {
+          statusCode: 404,
+          original: error,
+        })
+      }
+      throw error
+    })
+    res.json({ ok: true })
+  }
+)
+
+router.delete(
+  '/:wikidataId/equalities/:id',
+  processRequest({
+    params: z.object({ id: z.coerce.number() }),
+  }),
+  async (req, res) => {
+    const { id } = req.params
+    await deleteEquality(id).catch((error) => {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new GarboAPIError('Equality not found', {
           statusCode: 404,
           original: error,
         })

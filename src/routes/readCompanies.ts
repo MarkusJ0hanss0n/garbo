@@ -445,6 +445,36 @@ router.get(
               year: 'desc',
             },
           },
+          equalities: {
+            select: {
+              initiatives: {
+                select: {
+                  id: true,
+                  title: true,
+                  description: true,
+                  year: true,
+                  scope: true,
+                  metadata,
+                },
+                orderBy: {
+                  year: 'desc',
+                },
+              },
+              goals: {
+                select: {
+                  id: true,
+                  description: true,
+                  year: true,
+                  baseYear: true,
+                  target: true,
+                  metadata,
+                },
+                orderBy: {
+                  year: 'desc',
+                },
+              }
+            }
+          }
         },
       })
 

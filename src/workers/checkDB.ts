@@ -62,7 +62,7 @@ const checkDB = new DiscordWorker('checkDB', async (job: CheckDBJob) => {
     )
   }
 
-  const { scope12, scope3, biogenic, industry, economy, goals, initiatives } =
+  const { scope12, scope3, biogenic, industry, economy, goals, initiatives, equalities } =
     childrenValues
 
   const base = {
@@ -130,6 +130,16 @@ const checkDB = new DiscordWorker('checkDB', async (job: CheckDBJob) => {
             data: {
               ...base.data,
               initiatives,
+            },
+          }
+        : null,
+      equalities
+        ? {
+            ...base,
+            queueName: 'diffEqualities',
+            data: {
+              ...base.data,
+              equalities,
             },
           }
         : null,
