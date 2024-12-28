@@ -5,6 +5,7 @@ import { JobType } from '../types'
 import { zodResponseFormat } from 'openai/helpers/zod'
 import { resolve } from 'path'
 import { vectorDB } from '../lib/vectordb'
+import { pathToFileURL } from 'url'
 
 class FollowUpJob extends DiscordJob {
   declare data: DiscordJob['data'] & {
@@ -18,10 +19,12 @@ const followUp = new DiscordWorker<FollowUpJob>(
   'followUp',
   async (job: FollowUpJob) => {
     const { type, url, previousAnswer } = job.data
+    const followUpStagePath = resolve(import.meta.dirname, `../prompts/${type}`)
+    const followUpStageUrl = pathToFileURL(followUpStagePath).href
 
     const {
       default: { schema, prompt, queryTexts },
-    } = await import(resolve(import.meta.dirname, `../prompts/${type}`))
+    } = await import(followUpStageUrl)
 
     const markdown = await vectorDB.getRelevantMarkdown(url, queryTexts, 5)
 

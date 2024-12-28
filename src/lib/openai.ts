@@ -10,7 +10,7 @@ const openai = new OpenAI({
 const ask = async (messages: ChatCompletionMessageParam[], options?: any) => {
   const response = await openai.chat.completions.create({
     messages: messages.filter((m) => m.content),
-    model: 'gpt-4o',
+    model: 'gpt-4o-mini',
     temperature: 0.1,
     stream: false,
     ...options,
